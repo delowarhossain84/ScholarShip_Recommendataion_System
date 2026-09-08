@@ -1,0 +1,7 @@
+<?php
+require_once 'config.php';
+require_role('provider');
+$uid = (int)user()['id'];
+$rs = $conn->query("SELECT * FROM scholarships WHERE provider_id=$uid ORDER BY created_at DESC");
+?>
+<!DOCTYPE html><html lang="en"><head><title>My Scholarships</title><?php include 'partials/head.php'; ?></head><body><?php include 'partials/nav.php'; ?><div class="container"><?php show_flash(); ?><div class="dashboard-head"><h1 class="page-title">My Scholarships</h1><a class="btn" href="add_scholarship.php">+ Add Scholarship</a></div><div class="table-wrap"><table class="table"><tr><th>Title</th><th>Amount</th><th>Deadline</th><th>Applications</th><th>Action</th></tr><?php if ($rs && $rs->num_rows): ?><?php while($s=$rs->fetch_assoc()): $sid=(int)$s['id']; $n=$conn->query("SELECT COUNT(*) c FROM applications WHERE scholarship_id=$sid")->fetch_assoc()['c']; ?><tr><td><?=e($s['title'])?></td><td>৳<?=number_format((float)$s['amount'])?></td><td><?=e($s['deadline'])?></td><td><?=$n?></td><td><form method="POST" action="delete_scholarship.php" style="display:inline" onsubmit="return confirm('Delete this scholarship?')"><input type="hidden" name="csrf" value="<?=e(csrf())?>"><input type="hidden" name="id" value="<?=$sid?>"><button type="submit" class="danger">Delete</button></form></td></tr><?php endwhile; ?><?php else: ?><tr><td colspan="5">No scholarships found.</td></tr><?php endif; ?></table></div></div></body></html>
